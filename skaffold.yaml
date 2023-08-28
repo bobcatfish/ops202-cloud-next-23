@@ -1,0 +1,47 @@
+apiVersion: skaffold/v4beta4
+kind: Config
+metadata:
+  name: pop-stats
+build:
+  artifacts:
+  - image: pop-stats
+    context: app
+    docker:
+      dockerfile: Dockerfile
+manifests:
+  kustomize:
+    paths: 
+      - k8s/overlays/dev
+verify:
+- name: successful-request
+  executionMode:
+    kubernetesCluster: {}
+  container:
+    name: verification
+    image: alpine
+    command: ["sh"]
+    args:
+    - -c
+    - |
+      set -ex
+      REQUEST_COUNT=100
+      for _ in $(seq $REQUEST_COUNT)
+      do
+        wget http://pop-stats:8080
+      done
+portForward:
+- resourceType: deployment
+  resourceName: pop-stats
+  port: 8080 
+  localPort: 8080
+profiles:
+  - name: staging
+    manifests:
+      kustomize:
+        paths: 
+          - k8s/overlays/staging
+  - name: prod
+    manifests:
+      kustomize:
+        paths: 
+          - k8s/overlays/prod

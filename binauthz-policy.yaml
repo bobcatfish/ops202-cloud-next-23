@@ -1,0 +1,12 @@
+gkePolicy:
+  checkSets:
+  - checks:
+    - displayName: Require build as code
+      slsaCheck:
+        rules:
+        - attestationSource:
+            containerAnalysisAttestationProjects:
+            - projects/project-id-here
+          configBasedBuildRequired: true
+          trustedBuilder: GOOGLE_CLOUD_BUILD
+    displayName: GKE required checks
