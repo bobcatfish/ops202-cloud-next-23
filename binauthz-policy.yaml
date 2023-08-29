@@ -6,7 +6,7 @@ gkePolicy:
         rules:
         - attestationSource:
             containerAnalysisAttestationProjects:
-            - projects/catw-next-2023
+            - projects/project-id-here
           configBasedBuildRequired: true
           trustedBuilder: GOOGLE_CLOUD_BUILD
     displayName: GKE required checks

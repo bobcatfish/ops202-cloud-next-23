@@ -86,7 +86,7 @@ export RELEASE=rel-$(date +%s)
 gcloud deploy releases create ${RELEASE} \
   --delivery-pipeline pop-stats-pipeline-${IDENTIFIER} \
   --region us-central1 \
-  --images pop-stats=us-central1-docker.pkg.dev/$PROJECT_ID/pop-stats/pop-stats
+  --images pop-stats=us-central1-docker.pkg.dev/catw-farm/pop-stats/pop-stats@sha256:15c2aa214cb50f9d374f933a5994006e0ba85df2fc3c00fb478ecb81f8b162ba
 ```
 
 #### 2. Redundancy w/ multiple production targets and parallel deployment
@@ -123,7 +123,9 @@ You must give Cloud Build explicit permission to trigger a Google Cloud Deploy r
 3. Add these two roles
   * Cloud Deploy Releaser
   * Service Account User
-  * Artifact registry reader
+  * Making "gcloud artifacts docker images describe" work:
+    * Container Analysis Admin + service agent (probably overkill?)
+    * Artifact registry reader (???)
 
 You must give the service account that runs your kubernetes workloads
 permission to pull containers from artifact registry:
@@ -132,6 +134,20 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
     --member=serviceAccount:$(gcloud projects describe $PROJECT_ID \
     --format="value(projectNumber)")-compute@developer.gserviceaccount.com \
     --role="roles/artifactregistry.reader"
+
+# (TODO: why)
+# add the Kubernetes developer permission:
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+    --member=serviceAccount:$(gcloud projects describe $PROJECT_ID \
+    --format="value(projectNumber)")-compute@developer.gserviceaccount.com \
+    --role="roles/container.developer"
+
+# (TODO: why)
+# add the clouddeploy.jobRunner role to your compute service account
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+    --member=serviceAccount:$(gcloud projects describe $PROJECT_ID \
+    --format="value(projectNumber)")-compute@developer.gserviceaccount.com \
+    --role="roles/clouddeploy.jobRunner"
 ```
 
 ## Turn on automated container vulnerability analysis
