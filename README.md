@@ -87,6 +87,10 @@ gcloud auth configure-docker us-central1-docker.pkg.dev
 docker push $IMAGE
 ```
 
+Already built:
+* Manual: us-central1-docker.pkg.dev/catw-next-2023/pop-stats/pop-stats@sha256:e28155703403617c67b6babb09d3877fcdc7ccc12b285bed0025066de04a18ff
+* Bug: us-central1-docker.pkg.dev/catw-next-2023/pop-stats/pop-stats@sha256:572f2b4112daaea1f698c55cab98d506bef3dbb5e26a91a4eae217c7be5e178a
+
 Creating releases
 
 ```bash
@@ -274,6 +278,12 @@ To remove the three running GKE clusters, run:
 To run this app locally, start minikube:
 ```bash 
 minikube start
+```
+
+Make sure minikube is the current context:
+```bash
+kubectl config current-context
+minikube update-context
 ```
 
 From the pop-kustomize directory, run:
