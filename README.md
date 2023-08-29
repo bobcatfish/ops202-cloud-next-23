@@ -81,12 +81,21 @@ View Google Cloud Deploy pipelines in the:
 ```bash
 gcloud deploy apply --file clouddeploy-1.yaml --region=us-central1 --project=$PROJECT_ID
 
+# create an image to deploy
+export MANUAL=manual-$(date +%s)
+export IMAGE="us-central1-docker.pkg.dev/$PROJECT_ID/pop-stats/pop-stats:$MANUAL"
+docker build app/ -t $IMAGE -f app/Dockerfile
+
+# push the image
+gcloud auth configure-docker us-central1-docker.pkg.dev
+docker push $IMAGE
+
 # Need to push a canary deployment through or it will skip the first time
 export RELEASE=rel-$(date +%s)
 gcloud deploy releases create ${RELEASE} \
   --delivery-pipeline pop-stats-pipeline-${IDENTIFIER} \
   --region us-central1 \
-  --images pop-stats=us-central1-docker.pkg.dev/$PROJECT_ID/pop-stats/pop-stats
+  --images pop-stats=us-central1-docker.pkg.dev/$PROJECT_ID/pop-stats/pop-stats:$MANUAL
 ```
 
 #### 2. Redundancy w/ multiple production targets and parallel deployment
