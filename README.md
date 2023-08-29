@@ -76,27 +76,37 @@ sed -i "s/identifier/${IDENTIFIER}/" clouddeploy*.yaml
 View Google Cloud Deploy pipelines in the:
 [Google Cloud Deploy UI](https://console.cloud.google.com/deploy/delivery-pipelines)
 
-#### 1. Just one cluster, with a canary
+#### 0. Manual stuff
+
+Building images as needed
 
 ```bash
-gcloud deploy apply --file clouddeploy-1.yaml --region=us-central1 --project=$PROJECT_ID
-
-# create an image to deploy
-export MANUAL=manual-$(date +%s)
-export IMAGE="us-central1-docker.pkg.dev/$PROJECT_ID/pop-stats/pop-stats:$MANUAL"
+export PREFIX=bug
+export TAG=$PREFIX-$(date +%s)
+export IMAGE="us-central1-docker.pkg.dev/$PROJECT_ID/pop-stats/pop-stats:$TAG"
 docker build app/ -t $IMAGE -f app/Dockerfile
-
-# push the image
 gcloud auth configure-docker us-central1-docker.pkg.dev
 docker push $IMAGE
+gcloud deploy apply --file clouddeploy-2.yaml --region=us-central1 --project=$PROJECT_ID
+```
 
-# Need to push a canary deployment through or it will skip the first time
+Creating releases
+
+```bash
 export RELEASE=rel-$(date +%s)
 gcloud deploy releases create ${RELEASE} \
   --delivery-pipeline pop-stats-pipeline-${IDENTIFIER} \
   --region us-central1 \
-  --images pop-stats=us-central1-docker.pkg.dev/$PROJECT_ID/pop-stats/pop-stats:$MANUAL
+  --images $IMAGE
 ```
+
+#### 1. Just one cluster, with a canary
+
+```bash
+gcloud deploy apply --file clouddeploy-1.yaml --region=us-central1 --project=$PROJECT_ID
+```
+
+Need to push a canary deployment through or it will skip the first time
 
 #### 2. Redundancy w/ multiple production targets and parallel deployment
 
@@ -104,16 +114,8 @@ gcloud deploy releases create ${RELEASE} \
 gcloud deploy apply --file clouddeploy-2.yaml --region=us-central1 --project=$PROJECT_ID
 ```
 
-Try it out with the bad image:
+Try it out with the bad image.
 
-```bash
-export RELEASE=bad-$(date +%s)
-gcloud deploy releases create ${RELEASE} \
-  --delivery-pipeline pop-stats-pipeline-${IDENTIFIER} \
-  --region us-central1 \
-  popstats=us-central1-docker.pkg.dev/catw-farm/pop-stats/pop-stats:dd9023d13ff0aef4891ac1d28fe90417b128d2da
-```
-```
 #### 3. Add staging environment
 
 ```bash
