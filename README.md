@@ -68,9 +68,7 @@ Verify that they were created in the [GKE UI](https://console.cloud.google.com/k
 
 ```bash
 # customize the clouddeploy.yamls
-export IDENTIFIER=$(date +%s)
 sed -i "s/project-id-here/${PROJECT_ID}/" clouddeploy*.yaml
-sed -i "s/identifier/${IDENTIFIER}/" clouddeploy*.yaml
 ```
 
 View Google Cloud Deploy pipelines in the:
@@ -87,7 +85,6 @@ export IMAGE="us-central1-docker.pkg.dev/$PROJECT_ID/pop-stats/pop-stats:$TAG"
 docker build app/ -t $IMAGE -f app/Dockerfile
 gcloud auth configure-docker us-central1-docker.pkg.dev
 docker push $IMAGE
-gcloud deploy apply --file clouddeploy-2.yaml --region=us-central1 --project=$PROJECT_ID
 ```
 
 Creating releases
@@ -95,9 +92,9 @@ Creating releases
 ```bash
 export RELEASE=rel-$(date +%s)
 gcloud deploy releases create ${RELEASE} \
-  --delivery-pipeline pop-stats-pipeline-${IDENTIFIER} \
+  --delivery-pipeline pop-stats-pipeline \
   --region us-central1 \
-  --images $IMAGE
+  --images pop-stats=$IMAGE
 ```
 
 #### 1. Just one cluster, with a canary
@@ -131,9 +128,11 @@ You must give Cloud Build explicit permission to trigger a Google Cloud Deploy r
 2. Navigate to [IAM](https://console.cloud.google.com/iam-admin/iam)
   * Check "Include Google-provided role grants"
   * Locate the service account named "Cloud Build service account"
-3. Add these two roles
+3. Add these roles:
   * Cloud Deploy Releaser
   * Service Account User
+  * Container Analysis Admin
+  * Container Analysis service agent
   * Artifact registry reader
 
 You must give the service account that runs your kubernetes workloads
