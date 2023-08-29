@@ -134,6 +134,19 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
     --role="roles/artifactregistry.reader"
 ```
 
+You must give the service account that runs cloud deploy jobs the
+permissions it needs to operate:
+```bash
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+    --member=serviceAccount:$(gcloud projects describe $PROJECT_ID \
+    --format="value(projectNumber)")-compute@developer.gserviceaccount.com \
+    --role="roles/container.developer"
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+    --member=serviceAccount:$(gcloud projects describe $PROJECT_ID \
+    --format="value(projectNumber)")-compute@developer.gserviceaccount.com \
+    --role="roles/clouddeploy.jobRunner"
+```
+
 ## Turn on automated container vulnerability analysis
 Google Cloud Container Analysis can be set to automatically scan for vulnerabilities on push (see [pricing](https://cloud.google.com/container-analysis/pricing)). 
 
