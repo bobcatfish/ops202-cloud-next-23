@@ -132,6 +132,7 @@ You must give Cloud Build explicit permission to trigger a Google Cloud Deploy r
   * Cloud Deploy Releaser
   * Service Account User
   * Container Analysis Admin
+  * Container Analysis service agent
   * Artifact registry reader
 
 You must give the service account that runs your kubernetes workloads
