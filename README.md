@@ -128,9 +128,10 @@ You must give Cloud Build explicit permission to trigger a Google Cloud Deploy r
 2. Navigate to [IAM](https://console.cloud.google.com/iam-admin/iam)
   * Check "Include Google-provided role grants"
   * Locate the service account named "Cloud Build service account"
-3. Add these two roles
+3. Add these roles:
   * Cloud Deploy Releaser
   * Service Account User
+  * Container Analysis Admin
   * Artifact registry reader
 
 You must give the service account that runs your kubernetes workloads
