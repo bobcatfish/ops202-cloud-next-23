@@ -25,7 +25,6 @@ kind: Target
 metadata:
   name: prod
 description: prod multi-target
-requireApproval: true
 multiTarget:
   targetIds: [prod1, prod2, prod3]
 ---
