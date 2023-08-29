@@ -87,7 +87,6 @@ export IMAGE="us-central1-docker.pkg.dev/$PROJECT_ID/pop-stats/pop-stats:$TAG"
 docker build app/ -t $IMAGE -f app/Dockerfile
 gcloud auth configure-docker us-central1-docker.pkg.dev
 docker push $IMAGE
-gcloud deploy apply --file clouddeploy-2.yaml --region=us-central1 --project=$PROJECT_ID
 ```
 
 Creating releases
@@ -97,7 +96,7 @@ export RELEASE=rel-$(date +%s)
 gcloud deploy releases create ${RELEASE} \
   --delivery-pipeline pop-stats-pipeline-${IDENTIFIER} \
   --region us-central1 \
-  --images $IMAGE
+  --images pop-stats=$IMAGE
 ```
 
 #### 1. Just one cluster, with a canary
