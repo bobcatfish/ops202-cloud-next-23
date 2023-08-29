@@ -43,8 +43,8 @@ steps:
         exit 1
        elif [[ "$$STATE" == "SUCCEEDED" ]]; then
         exit 0
-        sleep 5
        fi
+       sleep 5
       done
 images:
 - us-central1-docker.pkg.dev/$PROJECT_ID/pop-stats/pop-stats:${COMMIT_SHA}
