@@ -1,4 +1,24 @@
-# OPS202 Demo: Devops Best Practices
+# Demo: Devops Best Practices
+
+This repo is a fork of https://github.com/nateaveryg/pop-kustomize which is meant to demonstrate
+setting up a project in GCP that follows devops best practices.
+
+The demo will be used to display:
+- [x] Cloud workstations
+- [x] GCB triggering
+- [x] Build and push to AR
+- [x] Cloud Deploy deploy to test
+- [x] Cloud Deploy promotion across environments
+- [x] Image scanning
+- [x] Cloud Build security insights
+- [x] Provenance generation
+- [x] Cloud Deploy security insights
+- [x] Cloud Deploy canary deployment w/ verification
+- [x] Cloud Deploy with parallel deployment
+- [x] Binauthz gating of deployment
+- [x] Local development w/ minikube
+
+## Setup tutorial
 
 ## Setup: enable APIs
 
@@ -34,21 +54,7 @@ gcloud artifacts repositories create pop-stats \
   --project=$PROJECT_ID
 ```
 
-### Create Google Cloud Deploy pipeline
-
-Create the cloud deploy pipeline:
-```bash
-# customize the clouddeploy.yaml 
-sed -i "s/project-id-here/${PROJECT_ID}/" clouddeploy.yaml
-# creates the Google Cloud Deploy pipeline
-gcloud deploy apply --file clouddeploy.yaml \
-  --region=us-central1 --project=$PROJECT_ID
-```
-
-Verify that the Google Cloud Deploy pipeline was created in the 
-[Google Cloud Deploy UI](https://console.cloud.google.com/deploy/delivery-pipelines)
-
-### Create Google Cloud Deploy pipeline
+### Create GKE clusters
 
 Create the GKE clusters:
 
@@ -57,6 +63,53 @@ Create the GKE clusters:
 ```
 
 Verify that they were created in the [GKE UI](https://console.cloud.google.com/kubernetes/list/overview)
+
+### Build up the pipeline
+
+```bash
+# customize the clouddeploy.yamls
+export IDENTIFIER=$(date +%s)
+sed -i "s/project-id-here/${PROJECT_ID}/" clouddeploy*.yaml
+sed -i "s/identifier/${IDENTIFIER}/" clouddeploy*.yaml
+```
+
+View Google Cloud Deploy pipelines in the:
+[Google Cloud Deploy UI](https://console.cloud.google.com/deploy/delivery-pipelines)
+
+#### 1. Just one cluster, with a canary
+
+```bash
+gcloud deploy apply --file clouddeploy-1.yaml --region=us-central1 --project=$PROJECT_ID
+
+# Need to push a canary deployment through or it will skip the first time
+export RELEASE=rel-$(date +%s)
+gcloud deploy releases create ${RELEASE} \
+  --delivery-pipeline pop-stats-pipeline-${IDENTIFIER} \
+  --region us-central1 \
+  --images pop-stats=us-central1-docker.pkg.dev/catw-farm/pop-stats/pop-stats@sha256:15c2aa214cb50f9d374f933a5994006e0ba85df2fc3c00fb478ecb81f8b162ba
+```
+
+#### 2. Redundancy w/ multiple production targets and parallel deployment
+
+```bash
+gcloud deploy apply --file clouddeploy-2.yaml --region=us-central1 --project=$PROJECT_ID
+```
+
+Try it out with the bad image:
+
+```bash
+export RELEASE=bad-$(date +%s)
+gcloud deploy releases create ${RELEASE} \
+  --delivery-pipeline pop-stats-pipeline-${IDENTIFIER} \
+  --region us-central1 \
+  popstats=us-central1-docker.pkg.dev/catw-farm/pop-stats/pop-stats:dd9023d13ff0aef4891ac1d28fe90417b128d2da
+```
+```
+#### 3. Add staging environment
+
+```bash
+gcloud deploy apply --file clouddeploy-3.yaml --region=us-central1 --project=$PROJECT_ID
+```
 
 ### Setup a Cloud Build trigger to deploy on merge to main
 
@@ -236,22 +289,6 @@ skaffold dev --profile prod
 
 Simple web app that pulls population and flag data based on country query.
 
-This repo is a fork of https://github.com/nateaveryg/pop-kustomize which is meant to demonstrate
-setting up a project in GCP that follows devops best practices.
-
 Population data from restcountries.com API.
 
-The demo will be used to display:
-- [x] Cloud workstations
-- [x] GCB triggering
-- [x] Build and push to AR
-- [x] Cloud Deploy deploy to test
-- [x] Cloud Deploy promotion across environments
-- [x] Image scanning
-- [x] Cloud Build security insights
-- [x] Provenance generation
-- [x] Cloud Deploy security insights
-- [x] Cloud Deploy canary deployment w/ verification
-- [x] Cloud Deploy with parallel deployment
-- [x] Binauthz gating of deployment
-- [x] Local development w/ minikube
+Feedback and contributions welcomed!

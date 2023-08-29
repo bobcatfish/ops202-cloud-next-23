@@ -1,0 +1,29 @@
+# replace "project-id-here" in the three targets below with your actual project(s)
+apiVersion: deploy.cloud.google.com/v1
+kind: DeliveryPipeline
+metadata:
+  name: pop-stats-pipeline-identifier
+description: pop-stats application delivery pipeline
+serialPipeline:
+ stages:
+ - targetId: prod
+   profiles:
+   - prod
+   strategy:
+    canary:
+      runtimeConfig:
+        kubernetes:
+          serviceNetworking:
+            service: "pop-stats"
+            deployment: "pop-stats"
+      canaryDeployment:
+        percentages: [5]
+        verify: true
+---
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+  name: prod
+description: prod cluster 1
+gke:
+  cluster: projects/project-id-here/locations/us-central1/clusters/prodcluster1

@@ -2,13 +2,10 @@
 apiVersion: deploy.cloud.google.com/v1
 kind: DeliveryPipeline
 metadata:
-  name: pop-stats-pipeline
+  name: pop-stats-pipeline-identifier
 description: pop-stats application delivery pipeline
 serialPipeline:
  stages:
- - targetId: staging
-   profiles:
-   - staging
  - targetId: prod
    profiles:
    - prod
@@ -22,14 +19,6 @@ serialPipeline:
       canaryDeployment:
         percentages: [5]
         verify: true
----
-apiVersion: deploy.cloud.google.com/v1
-kind: Target
-metadata:
-  name: staging
-description: staging cluster
-gke:
-  cluster: projects/project-id-here/locations/us-central1/clusters/stagingcluster
 ---
 apiVersion: deploy.cloud.google.com/v1
 kind: Target

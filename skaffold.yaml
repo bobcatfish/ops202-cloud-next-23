@@ -27,7 +27,7 @@ verify:
       REQUEST_COUNT=100
       for _ in $(seq $REQUEST_COUNT)
       do
-        wget http://pop-stats:8080
+        wget http://pop-stats:8080 -O /dev/null
       done
 portForward:
 - resourceType: deployment
