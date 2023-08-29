@@ -68,9 +68,7 @@ Verify that they were created in the [GKE UI](https://console.cloud.google.com/k
 
 ```bash
 # customize the clouddeploy.yamls
-export IDENTIFIER=$(date +%s)
 sed -i "s/project-id-here/${PROJECT_ID}/" clouddeploy*.yaml
-sed -i "s/identifier/${IDENTIFIER}/" clouddeploy*.yaml
 ```
 
 View Google Cloud Deploy pipelines in the:
@@ -94,7 +92,7 @@ Creating releases
 ```bash
 export RELEASE=rel-$(date +%s)
 gcloud deploy releases create ${RELEASE} \
-  --delivery-pipeline pop-stats-pipeline-${IDENTIFIER} \
+  --delivery-pipeline pop-stats-pipeline \
   --region us-central1 \
   --images pop-stats=$IMAGE
 ```
