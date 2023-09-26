@@ -83,7 +83,7 @@ def get_country_code_by_ip(ip_address):
     loc_api.raise_for_status()
     loc_data = loc_api.json()
     country_code = loc_data['countryCode']
-    if country_code != "":
+    if country_code == "":
         raise Exception(f'something terrible has happened, country code is {country_code}')
     return country_code
 
